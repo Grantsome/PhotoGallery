@@ -1,2 +1,1 @@
-# PhotoGallery
-图片加载器的另外一种实现
+# PhotoGallery图片加载器的另外一种实现## AsyncTask + HandlerThread 实现#### 效果如图![](/readMeNeedPicture/1.jpg)![](/readMeNeedPicture/2.jpg)
