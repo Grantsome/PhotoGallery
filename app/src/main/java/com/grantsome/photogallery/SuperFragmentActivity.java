@@ -2,14 +2,14 @@ package com.grantsome.photogallery;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * Created by tom on 2017/3/22.
  */
 
-public abstract class SuperFragmentActivity extends FragmentActivity {
+public abstract class SuperFragmentActivity extends AppCompatActivity{
 
     protected abstract Fragment createFragment();
 

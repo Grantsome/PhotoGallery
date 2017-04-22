@@ -31,6 +31,12 @@ public class HttpUtil {
 
     public static final String API_KEY = "89b13c41adafc85b80edbadc4a655b60";
 
+    public static final String FECTH_RECENTS_METHOD = "flickr.photos.getRecent";
+
+    public static final String SEARCH_METHOD = "flickr.photos.search";
+
+    private static final Uri ENDPOINT = Uri.parse("https://api.flickr.com/services/rest/").buildUpon().appendQueryParameter("api_key",API_KEY).appendQueryParameter("format","json").appendQueryParameter("nojsoncallback","1").appendQueryParameter("extras","url_s").build();
+
     public byte[] getUrlBytes(String urlSpec) throws IOException, NoSuchAlgorithmException, KeyManagementException {
         URL url = new URL(urlSpec);
         HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
@@ -58,25 +64,46 @@ public class HttpUtil {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public List<GalleryItem> fetchItems(){
+    public List<GalleryItem> fetchRecentPhotos(){
+        String url = buildUrl(FECTH_RECENTS_METHOD,null);
+        return downloadGalleryItems(url);
+    }
+
+    public List<GalleryItem> searchPhotos(String query){
+        String url = buildUrl(SEARCH_METHOD,query);
+        return downloadGalleryItems(url);
+    }
+
+    private String buildUrl(String method,String query) {
+        Uri.Builder uriBuilder = ENDPOINT.buildUpon().appendQueryParameter("method", method);
+        if (method.equals(SEARCH_METHOD)) {
+            uriBuilder.appendQueryParameter("text", query);
+        }
+
+        return uriBuilder.build().toString();
+    }
+
+    private List<GalleryItem> downloadGalleryItems(String url){
 
         List<GalleryItem> galleryItemList = new ArrayList<>();
 
         try {
-            if (PreUtil.getStringFromDefault(AppContext.getInstance(), TAG, "") == null) {
-                String url = Uri.parse("https://api.flickr.com/services/rest/").buildUpon().appendQueryParameter("method", "flickr.photos.getRecent").appendQueryParameter("api_key", API_KEY).appendQueryParameter("format", "json").appendQueryParameter("nojsoncallback", "1").appendQueryParameter("extras", "url_s").build().toString();
+            //PreUtil.getStringFromDefault(AppContext.getInstance(), TAG, "") == null
+
+                //String url = Uri.parse("https://api.flickr.com/services/rest/").buildUpon().appendQueryParameter("method", "flickr.photos.getRecent").appendQueryParameter("api_key", API_KEY).appendQueryParameter("format", "json").appendQueryParameter("nojsoncallback", "1").appendQueryParameter("extras", "url_s").build().toString();
                 Log.i(TAG, "HttpUrl: " + url);
                 String jsonString = getUrlString(url);
                 PreUtil.putStringToDefault(AppContext.getInstance(), TAG, jsonString);
                 Log.i(TAG, "Receive Json From Internet " + jsonString);
                 JSONObject jsonObject = new JSONObject(jsonString);
                 parseItems(galleryItemList,jsonObject);
-            }else {
+
+                /*
                 String jsonString = PreUtil.getStringFromDefault(AppContext.getInstance(), TAG, "");
                 Log.i(TAG, "Receive Json From Shared in else" + jsonString);
                 JSONObject jsonObject = new JSONObject(jsonString);
                 parseItems(galleryItemList,jsonObject);
-            }
+                */
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -96,6 +123,7 @@ public class HttpUtil {
                     continue;
                 }
                 item.setUrl(photoJsonObject.getString("url_s"));
+                item.setOwner(photoJsonObject.getString("owner"));
                 items.add(item);
             }
         }catch(Exception e){

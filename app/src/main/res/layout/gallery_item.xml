@@ -3,8 +3,9 @@
               android:orientation="vertical"
               android:id="@+id/fragment_photo_gallery_image_view"
               android:layout_gravity="center"
-              android:layout_width="match_parent"
-              android:layout_height="120dp">
+              android:scaleType="centerCrop"
+              android:layout_width="100dp"
+              android:layout_height="100dp">
 
 
 
